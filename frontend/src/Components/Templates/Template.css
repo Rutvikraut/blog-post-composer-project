@@ -1,0 +1,7 @@
+.blog-content h2,h1,h3{
+    font-weight: bold;
+    font-size: 22px;
+}
+p{
+    text-align: justify;
+}
