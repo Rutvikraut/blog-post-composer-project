@@ -13,7 +13,7 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 const openai = new OpenAI({
-    apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+    apiKey: process.env['OPENAI_API_KEY'],
 });
 
 app.get('/', (req, res) => {
@@ -28,14 +28,14 @@ app.post('/generateimg', async (req, res) => {
     }
     try {
         const response = await openai.images.generate({
-            // model: "dall-e-2",
             prompt,
             n: 1,
-            size:"1024x1024"
+            size:"1024x1024",
+            response_format: 'b64_json'
         });
-        const image_url = response.data[0].url;
+        const blob = response.data[0].b64_json;
         return res.status(200).send({
-            src: image_url
+            src: blob
         });
 
     } catch (error) {
@@ -45,7 +45,7 @@ app.post('/generateimg', async (req, res) => {
 
 })
 
-app.post('/generatetext', async (req, res) => {
+app.post('/generatetitle', async (req, res) => {
     console.log(req.body.prompt)
     const inputdata = req.body.prompt;
     console.log(inputdata)
@@ -55,18 +55,47 @@ app.post('/generatetext', async (req, res) => {
 
     try {
         const result = await openai.completions.create({
-            model: 'gpt-3.5-turbo-instruct', // Adjust the model according to your preference
-            prompt: `Generate title,content in json object for ${inputdata}.Content must be HTML. Make sure there is no new line character in the json. Every time generate new content and title`,
-            temperature: 0,
+            model: 'gpt-3.5-turbo-instruct',
+            prompt: `Generate creative title for ${inputdata}.`,
+            temperature: 0.8,
+            max_tokens: 50,
+            top_p: 1.0,
+            frequency_penalty: 0.5,
+            presence_penalty: 0.0
+        });
+        const jsonData = result.choices[0].text;
+        console.log(jsonData)
+        const parsedData = JSON.parse(jsonData);
+
+        return res.status(200).json(parsedData);
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ error: error.message });
+    }
+});
+app.post('/generatecontent', async (req, res) => {
+    console.log(req.body.prompt)
+    const inputdata = req.body.prompt;
+    console.log(inputdata)
+    if (!inputdata) {
+        return res.status(400).send('Bad Request');
+    }
+
+    try {
+        const result = await openai.completions.create({
+            model: 'gpt-3.5-turbo-instruct', 
+            prompt: `Generate blog content for ${inputdata}. Content having subtitle and paragraph in html`,
+            temperature: 0.8,
             max_tokens: 4000,
             top_p: 1.0,
             frequency_penalty: 0.5,
             presence_penalty: 0.0
         });
         const jsonData = result.choices[0].text;
-        const parsedData = JSON.parse(jsonData);
+        console.log(jsonData)
+        // const parsedData = JSON.parse(jsonData);
 
-        return res.status(200).json(parsedData);
+        return res.status(200).json(jsonData);
     } catch (error) {
         console.error('Error:', error);
         return res.status(500).json({ error: error.message });

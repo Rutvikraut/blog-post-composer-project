@@ -3,21 +3,26 @@ import { useLocation } from 'react-router-dom'
 import Template1 from '../Templates/Template1'
 import Template2 from '../Templates/Template2'
 import Template3 from '../Templates/Template3'
+import { Button } from '@material-tailwind/react'
 
 const TemplateSelector = () => {
     const location=useLocation()
     const imgsrc=location.state.img
-    const blog=location.state.text
-    const [selectedTemplate, setSelectedTemplate] = useState('template1'); // Default template
+    const title=location.state.title
+    const content=location.state.content
+    const author=location.state.author
+
+
+    const [selectedTemplate, setSelectedTemplate] = useState('template1');
   
     const renderTemplate = () => {
       switch (selectedTemplate) {
         case 'template1':
-          return <Template1 date={getCurrentDate()} imgsrc={imgsrc} blog={blog} />;
+          return <Template1 date={getCurrentDate()} author={author} imgsrc={imgsrc} title={title} content={content} />;
         case 'template2':
-          return <Template2 date={getCurrentDate()} imgsrc={imgsrc} blog={blog}/>;
+          return <Template2 date={getCurrentDate()} imgsrc={imgsrc} title={title} content={content}/>;
         case 'template3':
-            return <Template3 date={getCurrentDate()} imgsrc={imgsrc} blog={blog}/>;
+            return <Template3 date={getCurrentDate()} imgsrc={imgsrc} title={title} content={content}/>;
         default:
           return null;
       }
@@ -30,10 +35,9 @@ const TemplateSelector = () => {
   
     return (
       <div className='pt-20'>
-        <div className="flex">
-        {/* Side panel for template selection */}
+        <div className="flex justify-center">
         
-            <div className="w-1/4 overflow-y-auto h-screen border-r-2 border-black py-5">
+            {/* <div className="w-1/4 overflow-y-auto h-screen border-r-2 border-black py-5">
                 <div>
                     <h2 className='text-xl font-semibold text-center'>Choose Template</h2>
                 </div>
@@ -56,12 +60,10 @@ const TemplateSelector = () => {
                 >
                 <img src="src\images\image1.jpg" alt="Template 3" className="w-full h-auto cursor-pointer" />
                 </div>
-                {/* Add more template options here */}
             </div>
-            </div>
-            {/* Main content */}
+            </div> */}
             <div className="w-3/4">
-            {renderTemplate()}
+              {renderTemplate()}
             </div>
         </div>
       </div>

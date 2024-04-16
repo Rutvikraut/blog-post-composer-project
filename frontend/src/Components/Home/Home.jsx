@@ -7,6 +7,7 @@ import BarLoader from "react-spinners/BarLoader";
 function Home() {
   const navigate=useNavigate()
   const [prompt,setprompt]=useState("")
+  const [author,setauthor]=useState("")
   const [open,setopen]=useState(false)
   const [img,setimg]=useState("")
   const [loading,setloading]=useState(false)
@@ -18,21 +19,25 @@ function Home() {
             return
         }
         
+        
         console.log({prompt})
         const imgapi="http://localhost:8200/generateimg"
-        const textapi="http://localhost:8200/generatetext"
+        const textapi="http://localhost:8200/generatetitle"
+        const contentapi="http://localhost:8200/generatecontent"
+
         const data={prompt};
         setloading(true)
-        const [imgresponse,textresponse]=await Promise.all([
+        const [imgresponse,textresponse,contentresponse]=await Promise.all([
           axios.post(imgapi,data),
-          axios.post(textapi,data)
+          axios.post(textapi,data),
+          axios.post(contentapi,data)
         ])
         // const response=await axios.post(imgapi,data)
         const imgsrc=imgresponse.data.src;
-        console.log(imgsrc)
         const textdata=textresponse.data
+        const contentdata=contentresponse.data
         setimg(imgsrc)
-        navigate("/selecttemplate",{ state: {img:imgsrc,text:textdata} })
+        navigate("/selecttemplate",{ state: {img:imgsrc,title:textdata,content:contentdata,author:author} })
       } catch (error) {
         setopen(true);
         return
@@ -54,6 +59,9 @@ function Home() {
             </div>
             <div className="w-85">
                 <Input size="lg" variant='outlined' label="Prompt" placeholder='Prompt' value={prompt} onChange={(e)=>{setprompt(e.target.value)}} />
+            </div>
+            <div>
+              <Input size='sm' variant='outlined' label="Author Name" placeholder='Author Name' value={author} onChange={(e)=>{setauthor(e.target.value)}}></Input>
             </div>
             <div className='flex justify-center'>
               <Button onClick={clickHandler}>Generate</Button>
